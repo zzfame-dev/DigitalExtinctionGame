@@ -1,0 +1,28 @@
+[package]
+name = "de_core"
+description = "Various simple core utilities, structs, and so on for Digital Extinction."
+
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+repository.workspace = true
+keywords.workspace = true
+homepage.workspace = true
+license.workspace = true
+categories.workspace = true
+
+[dependencies]
+# DE
+de_types.workspace = true
+
+# Other
+async-std.workspace = true
+bevy.workspace = true
+dirs.workspace = true
+glam.workspace = true
+iyes_progress.workspace = true
+parry2d.workspace = true
+parry3d.workspace = true
+paste.workspace = true
+thiserror.workspace = true
+tinyvec.workspace = true

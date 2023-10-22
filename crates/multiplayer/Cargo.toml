@@ -1,0 +1,29 @@
+[package]
+name = "de_multiplayer"
+description = "In-game multiplayer functionality for Digital Extinction."
+
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+repository.workspace = true
+keywords.workspace = true
+homepage.workspace = true
+license.workspace = true
+categories.workspace = true
+
+[dependencies]
+# DE
+de_core.workspace = true
+de_gui.workspace = true
+de_messages = { workspace = true, features = ["bevy"] }
+de_net.workspace = true
+de_types.workspace = true
+
+# Other
+ahash.workspace = true
+async-std.workspace = true
+bevy.workspace = true
+bincode.workspace = true
+futures-lite.workspace = true
+iyes_progress.workspace = true
+tracing.workspace = true

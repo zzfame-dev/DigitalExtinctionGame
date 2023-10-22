@@ -1,0 +1,80 @@
+name: Docs
+
+on:
+  push:
+    branches:
+      - main
+  merge_group: {}
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTDOCFLAGS: --deny warnings
+
+jobs:
+  build:
+    name: Build
+    if: github.event.pull_request.draft == false
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Install Linux Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y libasound2-dev libudev-dev
+      - name: Install mdBook
+        run: curl -sSL https://github.com/rust-lang/mdBook/releases/download/v0.4.30/mdbook-v0.4.30-x86_64-unknown-linux-gnu.tar.gz | sudo tar -xz --directory=/usr/bin
+      - name: Rust Toolchain
+        uses: dtolnay/rust-toolchain@stable
+      - name: Versions
+        run: rustc --version && cargo --version && mdbook --version
+      - name: Build mdBook
+        working-directory: docs
+        run: |
+          mdbook test
+          mdbook build
+      - name: Build Rust Docs
+        run: cargo doc --no-deps --all-features --workspace --document-private-items
+      - name: Move Rust Docs
+        run: mv target/doc/ docs/book/rust
+      # https://github.com/actions/upload-pages-artifact#file-permissions
+      - run:  chmod -c -R +rX docs/book/
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: docs/book/
+
+  deploy:
+    name: Deploy
+    if: github.ref == 'refs/heads/main'
+
+    concurrency:
+      group: "pages"
+      cancel-in-progress: true
+
+    needs: build
+    runs-on: ubuntu-latest
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
